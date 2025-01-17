@@ -9,16 +9,12 @@
   <mat-tab-group>
 
     <mat-tab label="Beginners">
-
-
-
+      <courses-card-list [coursesList]="beginnerCourses()" />
     </mat-tab>
 
     <mat-tab label="Advanced">
-
-
+      <courses-card-list [coursesList]="advancedCourses()" />
     </mat-tab>
-
   </mat-tab-group>
 
 </div>
