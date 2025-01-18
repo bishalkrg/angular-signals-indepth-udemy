@@ -55,12 +55,22 @@ export class HomeComponent {
 
   protected onUpdatedCourse(updatedCourse: Course) {
     console.log('Home component received updated course', updatedCourse);
+
     if (updatedCourse) {
       const courses = this.courses();
       const newCourses = courses.map((course) =>
         course.id === updatedCourse.id ? updatedCourse : course
       );
       this.courses.set(newCourses);
+    }
+  }
+
+  protected onDeleteCourse(deletedCourse: Course) {
+    if (deletedCourse) {
+      const newCourse = this.courses().filter(
+        (course) => course.id !== deletedCourse.id
+      );
+      this.courses.set(newCourse);
     }
   }
 }

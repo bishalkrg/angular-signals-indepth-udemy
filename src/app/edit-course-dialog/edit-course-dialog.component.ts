@@ -31,7 +31,7 @@ export class EditCourseDialogComponent {
   private courseService = inject(CoursesService);
   fb = inject(FormBuilder);
   readonly dialogRef = inject(MatDialogRef<EditCourseDialogComponent>);
-  readonly data = inject(MAT_DIALOG_DATA) as { course: Course };
+  readonly data = inject(MAT_DIALOG_DATA) as { course: Course; mode: string };
   readonly course = model(this.data.course);
 
   form = this.fb.group({
@@ -42,12 +42,14 @@ export class EditCourseDialogComponent {
   });
 
   constructor() {
-    this.form.patchValue({
-      title: this.course()?.title,
-      longDescription: this.course()?.longDescription,
-      category: this.course()?.category,
-      iconUrl: this.course()?.iconUrl,
-    });
+    if (this.data.mode === 'edit') {
+      this.form.patchValue({
+        title: this.course()?.title,
+        longDescription: this.course()?.longDescription,
+        category: this.course()?.category,
+        iconUrl: this.course()?.iconUrl,
+      });
+    }
   }
 
   protected onCancel() {

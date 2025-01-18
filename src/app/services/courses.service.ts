@@ -43,8 +43,8 @@ export class CoursesService {
     );
   }
 
-  public deleteCourse(courseId: string) {
-    return this.http.delete<Course>(this.url + 'courses/' + courseId).pipe(
+  public deleteCourse(courseId: string):Observable<string> {
+    return this.http.delete<string>(this.url + 'courses/' + courseId).pipe(
       catchError(() => {
         return throwError(() => new Error('Error deleting course'));
       })

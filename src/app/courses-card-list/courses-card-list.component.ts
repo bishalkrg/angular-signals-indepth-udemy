@@ -17,11 +17,12 @@ export class CoursesCardListComponent {
   dialog = inject(MatDialog);
   coursesList = input.required<Course[]>();
   updatedCourse = output<Course>();
+  deletedCourse = output<Course>();
 
   protected openEditCourseDialog(course: Course) {
     console.log('Edit course', course);
     const dialogRef = this.dialog.open(EditCourseDialogComponent, {
-      data: { course: course },
+      data: { course: course, mode: 'edit' },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -31,7 +32,13 @@ export class CoursesCardListComponent {
       }
     });
   }
-}
-function throwError(error: any) {
-  throw new Error('Function not implemented.');
+
+  protected deleteCourse(course: Course) {
+   this.courseService.deleteCourse(course.id).subscribe((id) => {
+      if(id != undefined){
+        this.deletedCourse.emit(course);
+      }
+   });
+
+  }
 }
