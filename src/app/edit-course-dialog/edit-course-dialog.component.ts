@@ -10,7 +10,12 @@ import { Course } from '../models/course.model';
 import { EditCourseDialogData } from './edit-course-dialog.data.model';
 import { CoursesService } from '../services/courses.service';
 import { LoadingIndicatorComponent } from '../loading/loading.component';
-import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { CourseCategoryComboboxComponent } from '../course-category-combobox/course-category-combobox.component';
 import { CourseCategory } from '../models/course-category.model';
 
@@ -35,9 +40,9 @@ export class EditCourseDialogComponent {
   readonly course = model(this.data.course);
 
   form = this.fb.group({
-    title: [''],
+    title: ['', Validators.required],
     longDescription: [''],
-    category: [''],
+    category: ['', Validators.required],
     iconUrl: [''],
   });
 
@@ -57,12 +62,23 @@ export class EditCourseDialogComponent {
   }
 
   protected onSave() {
-    const partialCourse = this.form.value as Partial<Course>;
-    console.log('Partial course', partialCourse);
-    this.courseService.saveCourse(this.course().id, partialCourse).subscribe({
-      next: (course) => {
-        this.dialogRef.close(course);
-      },
-    });
+    if (this.data.mode === 'edit') {
+      const partialCourse = this.form.value as Partial<Course>;
+      console.log('Partial course', partialCourse);
+      this.courseService.saveCourse(this.course().id, partialCourse).subscribe({
+        next: (course) => {
+          this.dialogRef.close(course);
+        },
+      });
+    }
+
+    if (this.data.mode === 'create') {
+      const course = this.form.value as Course;
+      this.courseService.createCourse(course).subscribe({
+        next: (course) => {
+          this.dialogRef.close(course);
+        },
+      });
+    }
   }
 }

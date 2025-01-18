@@ -27,7 +27,7 @@ export class CoursesService {
       );
   }
 
-  public AddCourse(course: Course) {
+  public createCourse(course: Course) {
     return this.http.post<Course>(this.url + 'courses', course).pipe(
       catchError(() => {
         return throwError(() => new Error('Error adding course'));

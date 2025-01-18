@@ -19,6 +19,7 @@ import {
   outputToObservable,
   outputFromObservable,
 } from '@angular/core/rxjs-interop';
+import { EditCourseDialogComponent } from '../edit-course-dialog/edit-course-dialog.component';
 
 @Component({
   selector: 'home',
@@ -28,6 +29,7 @@ import {
 })
 export class HomeComponent {
   private courseService = inject(CoursesService);
+  private dialog = inject(MatDialog);
 
   //courses = toSignal(this.courseService.loadAllCourses(), { initialValue: [] });
 
@@ -52,6 +54,20 @@ export class HomeComponent {
   advancedCourses = computed(() => {
     return this.courses().filter((course) => course.category === 'ADVANCED');
   });
+
+  protected openAddCourseDialog() {
+    console.log('Add course');
+    const dialogRef = this.dialog.open(EditCourseDialogComponent, {
+      data: { mode: 'create' },
+    });
+
+    dialogRef.afterClosed().subscribe((course) => {
+      console.log('The dialog was closed', course);
+      if (course) {
+        this.courses.set([...this.courses(), course]);
+      }
+    });
+  }
 
   protected onUpdatedCourse(updatedCourse: Course) {
     console.log('Home component received updated course', updatedCourse);
