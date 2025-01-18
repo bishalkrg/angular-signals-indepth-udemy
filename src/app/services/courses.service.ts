@@ -26,4 +26,28 @@ export class CoursesService {
         })
       );
   }
+
+  public AddCourse(course: Course) {
+    return this.http.post<Course>(this.url + 'courses', course).pipe(
+      catchError(() => {
+        return throwError(() => new Error('Error adding course'));
+      })
+    );
+  }
+
+  public saveCourse(courseId: string, change: Partial<Course>) {
+    return this.http.put<Course>(this.url + 'courses/' + courseId, change).pipe(
+      catchError(() => {
+        return throwError(() => new Error('Error saving course'));
+      })
+    );
+  }
+
+  public deleteCourse(courseId: string) {
+    return this.http.delete<Course>(this.url + 'courses/' + courseId).pipe(
+      catchError(() => {
+        return throwError(() => new Error('Error deleting course'));
+      })
+    );
+  }
 }
