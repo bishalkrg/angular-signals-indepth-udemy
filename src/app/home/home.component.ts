@@ -29,7 +29,15 @@ import {
 export class HomeComponent {
   private courseService = inject(CoursesService);
 
-  courses = toSignal(this.courseService.loadAllCourses(), { initialValue: [] });
+  //courses = toSignal(this.courseService.loadAllCourses(), { initialValue: [] });
+
+  courses = signal<Course[]>([]);
+
+  constructor() {
+    this.courseService.loadAllCourses().subscribe((courses) => {
+      this.courses.set(courses);
+    });
+  }
 
   beginnerCourses = computed(() => {
     return this.courses().filter((course) => course.category === 'BEGINNER');
@@ -44,4 +52,15 @@ export class HomeComponent {
   advancedCourses = computed(() => {
     return this.courses().filter((course) => course.category === 'ADVANCED');
   });
+
+  protected onUpdatedCourse(updatedCourse: Course) {
+    console.log('Home component received updated course', updatedCourse);
+    if (updatedCourse) {
+      const courses = this.courses();
+      const newCourses = courses.map((course) =>
+        course.id === updatedCourse.id ? updatedCourse : course
+      );
+      this.courses.set(newCourses);
+    }
+  }
 }

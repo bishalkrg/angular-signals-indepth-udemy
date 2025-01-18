@@ -28,15 +28,39 @@ import { CourseCategory } from '../models/course-category.model';
   styleUrl: './edit-course-dialog.component.scss',
 })
 export class EditCourseDialogComponent {
+  private courseService = inject(CoursesService);
+  fb = inject(FormBuilder);
   readonly dialogRef = inject(MatDialogRef<EditCourseDialogComponent>);
   readonly data = inject(MAT_DIALOG_DATA) as { course: Course };
   readonly course = model(this.data.course);
+
+  form = this.fb.group({
+    title: [''],
+    longDescription: [''],
+    category: [''],
+    iconUrl: [''],
+  });
+
+  constructor() {
+    this.form.patchValue({
+      title: this.course()?.title,
+      longDescription: this.course()?.longDescription,
+      category: this.course()?.category,
+      iconUrl: this.course()?.iconUrl,
+    });
+  }
 
   protected onCancel() {
     this.dialogRef.close();
   }
 
   protected onSave() {
-    this.dialogRef.close(this.course());
+    const partialCourse = this.form.value as Partial<Course>;
+    console.log('Partial course', partialCourse);
+    this.courseService.saveCourse(this.course().id, partialCourse).subscribe({
+      next: (course) => {
+        this.dialogRef.close(course);
+      },
+    });
   }
 }
