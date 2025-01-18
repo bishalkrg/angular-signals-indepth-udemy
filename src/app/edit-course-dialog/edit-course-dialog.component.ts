@@ -18,6 +18,8 @@ import {
 } from '@angular/forms';
 import { CourseCategoryComboboxComponent } from '../course-category-combobox/course-category-combobox.component';
 import { CourseCategory } from '../models/course-category.model';
+import { LoadingService } from '../loading/loading.service';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'edit-course-dialog',
@@ -34,6 +36,7 @@ import { CourseCategory } from '../models/course-category.model';
 })
 export class EditCourseDialogComponent {
   private courseService = inject(CoursesService);
+  #loadingService = inject(LoadingService);
   fb = inject(FormBuilder);
   readonly dialogRef = inject(MatDialogRef<EditCourseDialogComponent>);
   readonly data = inject(MAT_DIALOG_DATA) as { course: Course; mode: string };
@@ -62,23 +65,38 @@ export class EditCourseDialogComponent {
   }
 
   protected onSave() {
+    this.#loadingService.show();
     if (this.data.mode === 'edit') {
       const partialCourse = this.form.value as Partial<Course>;
       console.log('Partial course', partialCourse);
-      this.courseService.saveCourse(this.course().id, partialCourse).subscribe({
-        next: (course) => {
-          this.dialogRef.close(course);
-        },
-      });
+      this.courseService
+        .saveCourse(this.course().id, partialCourse)
+        .pipe(
+          finalize(() => {
+            this.#loadingService.hide();
+          })
+        )
+        .subscribe({
+          next: (course) => {
+            this.dialogRef.close(course);
+          },
+        });
     }
 
     if (this.data.mode === 'create') {
       const course = this.form.value as Course;
-      this.courseService.createCourse(course).subscribe({
-        next: (course) => {
-          this.dialogRef.close(course);
-        },
-      });
+      this.courseService
+        .createCourse(course)
+        .pipe(
+          finalize(() => {
+            this.#loadingService.hide();
+          })
+        )
+        .subscribe({
+          next: (course: Course) => {
+            this.dialogRef.close(course);
+          },
+        });
     }
   }
 }

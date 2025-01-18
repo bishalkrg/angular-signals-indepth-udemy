@@ -4,7 +4,8 @@ import { Course } from '../models/course.model';
 import { MatDialog } from '@angular/material/dialog';
 import { EditCourseDialogComponent } from '../edit-course-dialog/edit-course-dialog.component';
 import { CoursesService } from '../services/courses.service';
-import { map } from 'rxjs';
+import { finalize, map } from 'rxjs';
+import { LoadingService } from '../loading/loading.service';
 
 @Component({
   selector: 'courses-card-list',
@@ -15,6 +16,7 @@ import { map } from 'rxjs';
 export class CoursesCardListComponent {
   private courseService = inject(CoursesService);
   dialog = inject(MatDialog);
+  #loadingService = inject(LoadingService);
   coursesList = input.required<Course[]>();
   updatedCourse = output<Course>();
   deletedCourse = output<Course>();
@@ -34,11 +36,18 @@ export class CoursesCardListComponent {
   }
 
   protected deleteCourse(course: Course) {
-   this.courseService.deleteCourse(course.id).subscribe((id) => {
-      if(id != undefined){
-        this.deletedCourse.emit(course);
-      }
-   });
-
+    this.#loadingService.show();
+    this.courseService
+      .deleteCourse(course.id)
+      .pipe(
+        finalize(() => {
+          this.#loadingService.hide();
+        })
+      )
+      .subscribe((id) => {
+        if (id != undefined) {
+          this.deletedCourse.emit(course);
+        }
+      });
   }
 }

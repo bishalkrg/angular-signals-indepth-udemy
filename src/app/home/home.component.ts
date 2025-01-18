@@ -20,6 +20,7 @@ import {
   outputFromObservable,
 } from '@angular/core/rxjs-interop';
 import { EditCourseDialogComponent } from '../edit-course-dialog/edit-course-dialog.component';
+import { LoadingService } from '../loading/loading.service';
 
 @Component({
   selector: 'home',
@@ -30,15 +31,18 @@ import { EditCourseDialogComponent } from '../edit-course-dialog/edit-course-dia
 export class HomeComponent {
   private courseService = inject(CoursesService);
   private dialog = inject(MatDialog);
+  private loadingService = inject(LoadingService);
 
   //courses = toSignal(this.courseService.loadAllCourses(), { initialValue: [] });
 
   courses = signal<Course[]>([]);
 
   constructor() {
+    this.loadingService.show();
     this.courseService.loadAllCourses().subscribe((courses) => {
       this.courses.set(courses);
     });
+    this.loadingService.hide();
   }
 
   beginnerCourses = computed(() => {
