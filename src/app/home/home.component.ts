@@ -32,6 +32,7 @@ export class HomeComponent {
   private courseService = inject(CoursesService);
   private dialog = inject(MatDialog);
   private loadingService = inject(LoadingService);
+  #messagesService = inject(MessagesService);
 
   //courses = toSignal(this.courseService.loadAllCourses(), { initialValue: [] });
 
@@ -39,9 +40,18 @@ export class HomeComponent {
 
   constructor() {
     this.loadingService.show();
-    this.courseService.loadAllCourses().subscribe((courses) => {
-      this.courses.set(courses);
-    });
+    this.courseService
+      .loadAllCourses()
+      .pipe(
+        catchError((err) => {
+          this.#messagesService.showMessage('error loading courses', 'error');
+          this.loadingService.hide();
+          return throwError(() => err);
+        })
+      )
+      .subscribe((courses) => {
+        this.courses.set(courses);
+      });
     this.loadingService.hide();
   }
 
