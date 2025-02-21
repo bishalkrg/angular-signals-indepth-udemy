@@ -41,6 +41,7 @@ export class EditCourseDialogComponent {
   readonly dialogRef = inject(MatDialogRef<EditCourseDialogComponent>);
   readonly data = inject(MAT_DIALOG_DATA) as { course: Course; mode: string };
   readonly course = model(this.data.course);
+  protected category = signal<CourseCategory>(this.course().category);
 
   form = this.fb.group({
     title: ['', Validators.required],
@@ -54,9 +55,9 @@ export class EditCourseDialogComponent {
       this.form.patchValue({
         title: this.course()?.title,
         longDescription: this.course()?.longDescription,
-        category: this.course()?.category,
         iconUrl: this.course()?.iconUrl,
       });
+      this.category.set(this.data?.course?.category);
     }
   }
 
